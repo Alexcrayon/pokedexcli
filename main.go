@@ -7,7 +7,16 @@ import (
 	"strings"
 )
 
+type cliCommand struct {
+	name        string
+	description string
+	callback    func() error
+}
+
+//var cmdMap =
+
 func main() {
+
 	//fmt.Println("Hello, World!")
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -24,8 +33,14 @@ func main() {
 			fmt.Println("reading error:", err)
 		}
 
+		cmd := cleanInput(in.String())[0]
+		if val, ok := fetchCmd()[cmd]; ok {
+			val.callback()
+		} else {
+			fmt.Println("Unknown command")
+		}
 		//fmt.Println("Your command was:" + cleanInput(in)[0])
-		fmt.Println("Your command was: " + cleanInput(in.String())[0])
+		//fmt.Println("Your command was: " + cleanInput(in.String())[0])
 	}
 
 }
@@ -36,4 +51,19 @@ func cleanInput(text string) []string {
 	cleaned := strings.Fields(lower)
 	return cleaned
 	//return nil
+}
+
+func fetchCmd() map[string]cliCommand {
+	return map[string]cliCommand{
+		"exit": {
+			name:        "exit",
+			description: "Exit the Pokedex",
+			callback:    commandExit,
+		},
+		"help": {
+			name:        "help",
+			description: "Display a help message",
+			callback:    commandHelp,
+		},
+	}
 }
