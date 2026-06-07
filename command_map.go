@@ -1,0 +1,56 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+)
+
+type location struct {
+	Count    int     `json:"count"`
+	Next     *string `json:"next"` // pointer: null at the last page
+	Previous *string `json:"previous"`
+	Results  []struct {
+		Name string `json:"name"`
+		//URL  string `json:"url"`
+	} `json:"results"`
+}
+
+func commandMap(c *config) error {
+
+	url := "https://pokeapi.co/api/v2/location-area/"
+	if c.Next != nil {
+		url = *c.Next
+	}
+	//} else {
+	//	fmt.Println("you're at last page")
+	//	return nil
+	//}
+	res, err := http.Get(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	body, err := io.ReadAll(res.Body)
+	defer res.Body.Close()
+	if res.StatusCode > 299 {
+		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var loc location
+	if err := json.Unmarshal(body, &loc); err != nil {
+		return err
+	}
+
+	c.Next = loc.Next
+	c.Previous = loc.Previous
+	for _, result := range loc.Results {
+		fmt.Println(result.Name)
+	}
+	//fmt.Printf(loc.Results[0].Name)
+	return nil
+}
