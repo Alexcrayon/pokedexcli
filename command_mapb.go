@@ -15,12 +15,13 @@ func commandMapb(c *config) error {
 		return nil
 	}
 	url := *c.Previous
-
+	fmt.Println("Prev URL:", url)
 	var body []byte
 	if cached, ok := c.cache.Get(url); ok {
 		body = cached
-
+		fmt.Println("map back cache hit")
 	} else {
+		fmt.Println("map back cache missed")
 		res, err := http.Get(url)
 		if err != nil {
 			log.Fatal(err)
@@ -34,6 +35,8 @@ func commandMapb(c *config) error {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		c.cache.Add(url, body)
 	}
 
 	var loc location

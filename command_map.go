@@ -6,8 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"pokedexcli/internal/pokecache"
-	"time"
 )
 
 type location struct {
@@ -22,21 +20,16 @@ type location struct {
 
 func commandMap(c *config) error {
 
-	url := "https://pokeapi.co/api/v2/location-area/"
+	url := "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
 	if c.Next != nil {
 		url = *c.Next
 	}
-	pokecache.NewCache(10 * time.Second)
-
-	//} else {
-	//	fmt.Println("you're at last page")
-	//	return nil
-	//}
-
 	var body []byte
 	if cached, ok := c.cache.Get(url); ok {
 		body = cached
+		fmt.Println("map Cache Hit")
 	} else {
+		fmt.Println("map Cache missed")
 		res, err := http.Get(url)
 		if err != nil {
 			log.Fatal(err)

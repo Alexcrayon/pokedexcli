@@ -31,17 +31,18 @@ func NewCache(inter time.Duration) *Cache {
 }
 
 func (c *Cache) Add(key string, val []byte) {
-	fmt.Println("cache add called")
+	//fmt.Println("cache add called")
 	c.mutex.Lock()
 	c.cache[key] = cacheEntry{
 		createdAt: time.Now(),
 		val:       val,
 	}
 	c.mutex.Unlock()
+	fmt.Printf("ADD %q  (size now %d)\n", key, len(c.cache))
 }
 
 func (c *Cache) Get(key string) ([]byte, bool) {
-	fmt.Println("cache get called")
+	//fmt.Println("cache get called")
 	c.mutex.Lock()
 
 	result, ok := c.cache[key]
@@ -66,6 +67,7 @@ func (c *Cache) reapLoop() {
 		for k, v := range c.cache {
 			elapsed := time.Now().Sub(v.createdAt)
 			if elapsed > c.interval {
+				fmt.Printf("REAP %q (age %v)\n", k, elapsed)
 				delete(c.cache, k)
 			}
 		}
