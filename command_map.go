@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"pokedexcli/internal/pokecache"
+	"time"
 )
 
 type location struct {
@@ -24,21 +26,31 @@ func commandMap(c *config) error {
 	if c.Next != nil {
 		url = *c.Next
 	}
+	pokecache.NewCache(10 * time.Second)
+
 	//} else {
 	//	fmt.Println("you're at last page")
 	//	return nil
 	//}
-	res, err := http.Get(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-	body, err := io.ReadAll(res.Body)
-	defer res.Body.Close()
-	if res.StatusCode > 299 {
-		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
-	}
-	if err != nil {
-		log.Fatal(err)
+
+	var body []byte
+	if cached, ok := c.cache.Get(url); ok {
+		body = cached
+	} else {
+		res, err := http.Get(url)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer res.Body.Close()
+		body, err = io.ReadAll(res.Body)
+		if res.StatusCode > 299 {
+			log.Fatalf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		c.cache.Add(url, body)
 	}
 
 	var loc location
