@@ -1,6 +1,7 @@
 package pokecache
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -30,6 +31,7 @@ func NewCache(inter time.Duration) *Cache {
 }
 
 func (c *Cache) Add(key string, val []byte) {
+	fmt.Println("cache add called")
 	c.mutex.Lock()
 	c.cache[key] = cacheEntry{
 		createdAt: time.Now(),
@@ -39,6 +41,7 @@ func (c *Cache) Add(key string, val []byte) {
 }
 
 func (c *Cache) Get(key string) ([]byte, bool) {
+	fmt.Println("cache get called")
 	c.mutex.Lock()
 
 	result, ok := c.cache[key]
