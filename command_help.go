@@ -4,7 +4,7 @@ import "fmt"
 
 func commandHelp(c *config) error {
 	fmt.Println("Welcome to the Pokedex!")
-	fmt.Println("Usage:\n")
+	fmt.Println("Usage:")
 
 	//printCmd()
 	// fmt.Println("help: Display a help message")
