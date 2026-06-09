@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"pokedexcli/internal/pokecache"
 	"strings"
+	"time"
 )
 
 type cliCommand struct {
@@ -15,6 +17,7 @@ type cliCommand struct {
 type config struct {
 	Next     *string
 	Previous *string
+	cache    *pokecache.Cache
 }
 
 //var cmdMap =
@@ -26,6 +29,7 @@ func main() {
 	c := config{
 		nil,
 		nil,
+		pokecache.NewCache(10 * time.Second),
 	}
 	for {
 		fmt.Print("Pokedex > ")
@@ -44,8 +48,10 @@ func main() {
 		if val, ok := fetchCmd()[cmd]; ok {
 
 			err := val.callback(&c)
+
 			if err != nil {
-				return
+				fmt.Println(err) // see what actually went wrong
+				continue         // keep looping
 			}
 		} else {
 			fmt.Println("Unknown command")
