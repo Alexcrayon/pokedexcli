@@ -12,7 +12,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(c *config) error
+	callback    func(c *config, a string) error
 }
 type config struct {
 	Next     *string
@@ -29,7 +29,7 @@ func main() {
 	c := config{
 		nil,
 		nil,
-		pokecache.NewCache(10 * time.Second),
+		pokecache.NewCache(20 * time.Second),
 	}
 	for {
 		fmt.Print("Pokedex > ")
@@ -44,11 +44,16 @@ func main() {
 			fmt.Println("reading error:", err)
 		}
 
-		cmd := cleanInput(in.String())[0]
+		input := cleanInput(in.String())
+		cmd := input[0]
+
+		var args string
+		if len(input) > 1 {
+			args = input[1]
+		}
+
 		if val, ok := fetchCmd()[cmd]; ok {
-
-			err := val.callback(&c)
-
+			err := val.callback(&c, args)
 			if err != nil {
 				fmt.Println(err) // see what actually went wrong
 				continue         // keep looping
@@ -91,6 +96,11 @@ func fetchCmd() map[string]cliCommand {
 			name:        "mapb",
 			description: "List the previous 20 location-areas",
 			callback:    commandMapb,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Explore the given location-area, list the pokemons",
+			callback:    commandExplore,
 		},
 	}
 }
