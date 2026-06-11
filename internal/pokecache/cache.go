@@ -38,7 +38,7 @@ func (c *Cache) Add(key string, val []byte) {
 		val:       val,
 	}
 	c.mutex.Unlock()
-	fmt.Printf("ADD %q  (size now %d)\n", key, len(c.cache))
+	//fmt.Printf("ADD %q  (size now %d)\n", key, len(c.cache))
 }
 
 func (c *Cache) Get(key string) ([]byte, bool) {
