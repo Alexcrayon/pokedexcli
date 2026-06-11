@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func commandMapb(c *config) error {
+func commandMapb(c *config, a string) error {
 
 	if c.Previous == nil {
 		fmt.Println("you're on the first page")

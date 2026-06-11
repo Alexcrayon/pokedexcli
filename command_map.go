@@ -18,7 +18,7 @@ type location struct {
 	} `json:"results"`
 }
 
-func commandMap(c *config) error {
+func commandMap(c *config, a string) error {
 
 	url := "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
 	if c.Next != nil {
